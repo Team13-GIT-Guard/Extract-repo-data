@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 2560px;
+  height: 1080px;
+  position: relative;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+    position: center;
+}
+
+text{
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.toolTip {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    position: absolute;
+    display: none;
+    width: auto;
+    height: auto;
+    background: none repeat scroll 0 0 white;
+    border: 0 none;
+    border-radius: 8px 8px 8px 8px;
+    box-shadow: -3px 3px 15px #888888;
+    color: black;
+    font: 12px sans-serif;
+    padding: 5px;
+    text-align: center;
+}
+
+.legend {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 60%;
+}
+
+rect {
+    stroke-width: 2;
+}
+
+text {
+  font: 10px sans-serif;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path{
+  fill: none;
+  stroke: #000;
+}
+
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis .tick line {
+  stroke-width: 1;
+  stroke: rgba(0, 0, 0, 0.2);
+}
+
+.axisHorizontal path{
+  fill: none;
+}
+
+.axisHorizontal line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axisHorizontal .tick line {
+  stroke-width: 1;
+  stroke: rgba(0, 0, 0, 0.2);
+}
+
+.bar {
+  fill: steelblue;
+  fill-opacity: .9;
+}
+
+.x.axis path {
+  display: none;
+}
+</style>
+<body>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+var margin = {top: (parseInt(d3.select('body').style('width'), 10)/10), right: (parseInt(d3.select('body').style('width'), 10)/20), bottom: (parseInt(d3.select('body').style('width'), 10)/5), left: (parseInt(d3.select('body').style('width'), 10)/20)},
+    width = parseInt(d3.select('body').style('width'), 10) - margin.left - margin.right,
+    height = parseInt(d3.select('body').style('height'), 10) - margin.top - margin.bottom;
+
+var x0 = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var x1 = d3.scale.ordinal();
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var colorRange = d3.scale.category20();
+var color = d3.scale.ordinal()
+    .range(colorRange.range());
+
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+
+var divTooltip = d3.select("body").append("div").attr("class", "toolTip");
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+dataset = [
+   {label:"2012-04-29", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":7},
+   {label:"2012-05-06", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":3},
+   {label:"2012-05-13", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":11},
+   {label:"2012-05-20", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":14},
+   {label:"2012-05-27", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":3},
+   {label:"2012-06-03", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-06-10", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-06-17", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-06-24", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-07-01", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-07-08", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-07-15", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-07-22", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-07-29", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-08-05", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-08-12", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-08-19", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-08-26", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-09-02", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-09-09", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-09-16", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-09-23", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-09-30", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-10-07", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":3},
+   {label:"2012-10-14", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":9},
+   {label:"2012-10-21", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":4},
+   {label:"2012-10-28", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":6},
+   {label:"2012-11-04", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-11-11", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":8},
+   {label:"2012-11-18", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-11-25", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-12-02", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-12-09", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-12-16", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-12-23", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2012-12-30", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-01-06", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-01-13", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-01-20", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-01-27", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-02-03", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-02-10", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-02-17", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-02-24", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-03-03", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-03-10", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":7},
+   {label:"2013-03-17", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-03-24", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":3},
+   {label:"2013-03-31", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":3},
+   {label:"2013-04-07", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":6},
+   {label:"2013-04-14", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":5},
+   {label:"2013-04-21", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-04-28", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2013-05-05", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":14},
+   {label:"2013-05-12", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":6},
+   {label:"2013-05-19", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":6},
+   {label:"2013-05-26", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-06-02", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":7},
+   {label:"2013-06-09", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":9},
+   {label:"2013-06-16", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":5},
+   {label:"2013-06-23", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":18},
+   {label:"2013-06-30", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":20},
+   {label:"2013-07-07", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":13},
+   {label:"2013-07-14", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":15},
+   {label:"2013-07-21", "xxyy":0, "ZhijieWang":1, "adam-waldenberg":19},
+   {label:"2013-07-28", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":7},
+   {label:"2013-08-04", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2013-08-11", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2013-08-18", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-08-25", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-09-01", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-09-08", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-09-15", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2013-09-22", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-09-29", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-10-06", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-10-13", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-10-20", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2013-10-27", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2013-11-03", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-11-10", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-11-17", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-11-24", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-12-01", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2013-12-08", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-12-15", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-12-22", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2013-12-29", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-01-05", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":3},
+   {label:"2014-01-12", "xxyy":0, "ZhijieWang":1, "adam-waldenberg":7},
+   {label:"2014-01-19", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":3},
+   {label:"2014-01-26", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2014-02-02", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-02-09", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2014-02-16", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":7},
+   {label:"2014-02-23", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":7},
+   {label:"2014-03-02", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-03-09", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-03-16", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2014-03-23", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-03-30", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-04-06", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-04-13", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-04-20", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-04-27", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-05-04", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-05-11", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-05-18", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-05-25", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-06-01", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-06-08", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-06-15", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-06-22", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-06-29", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2014-07-06", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-07-13", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-07-20", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-07-27", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-08-03", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-08-10", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-08-17", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-08-24", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-08-31", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-09-07", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-09-14", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-09-21", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-09-28", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-10-05", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-10-12", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-10-19", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-10-26", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-11-02", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2014-11-09", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-11-16", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2014-11-23", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":7},
+   {label:"2014-11-30", "xxyy":1, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2014-12-07", "xxyy":0, "ZhijieWang":1, "adam-waldenberg":1},
+   {label:"2014-12-14", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":4},
+   {label:"2014-12-21", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2014-12-28", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-01-04", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-01-11", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-01-18", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-01-25", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-02-01", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-02-08", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-02-15", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2015-02-22", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2015-03-01", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-03-08", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-03-15", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-03-22", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-03-29", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-04-05", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-04-12", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-04-19", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-04-26", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-05-03", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-05-10", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-05-17", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-05-24", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-05-31", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-06-07", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-06-14", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-06-21", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-06-28", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-07-05", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-07-12", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-07-19", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-07-26", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-08-02", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-08-09", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-08-16", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-08-23", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":8},
+   {label:"2015-08-30", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":5},
+   {label:"2015-09-06", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":6},
+   {label:"2015-09-13", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2015-09-20", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":8},
+   {label:"2015-09-27", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":7},
+   {label:"2015-10-04", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":4},
+   {label:"2015-10-11", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":6},
+   {label:"2015-10-18", "xxyy":1, "ZhijieWang":2, "adam-waldenberg":7},
+   {label:"2015-10-25", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":23},
+   {label:"2015-11-01", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":18},
+   {label:"2015-11-08", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-11-15", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-11-22", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":5},
+   {label:"2015-11-29", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-12-06", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2015-12-13", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":5},
+   {label:"2015-12-20", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2015-12-27", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-01-03", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-01-10", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-01-17", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2016-01-24", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-01-31", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":2},
+   {label:"2016-02-07", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-02-14", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-02-21", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-02-28", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-03-06", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-03-13", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-03-20", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-03-27", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-04-03", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-04-10", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-04-17", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-04-24", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-05-01", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-05-08", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-05-15", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-05-22", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-05-29", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-06-05", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-06-12", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-06-19", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-06-26", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-07-03", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-07-10", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-07-17", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":1},
+   {label:"2016-07-24", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-07-31", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-08-07", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-08-14", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-08-21", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-08-28", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-09-04", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-09-11", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-09-18", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-09-25", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-10-02", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-10-09", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-10-16", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-10-23", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0},
+   {label:"2016-10-30", "xxyy":0, "ZhijieWang":0, "adam-waldenberg":0}
+];
+
+var options = d3.keys(dataset[0]).filter(function(key) { return key !== "label"; });
+dataset.forEach(function(d) {
+    d.valores = options.map(function(name) { return {name: name, value: +d[name]}; });
+});
+
+x0.domain(dataset.map(function(d) { return d.label; }));
+x1.domain(options).rangeRoundBands([0, x0.rangeBand()]);
+y.domain([0, d3.max(dataset, function(d) { return d3.max(d.valores, function(d) { return d.value; }); })]);
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", function(d) {return "rotate(-65)" });
+
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("# of commits");
+
+var bar = svg.selectAll(".bar")
+    .data(dataset)
+    .enter().append("g")
+    .attr("class", "rect")
+    .attr("transform", function(d) { return "translate(" + x0(d.label) + ",0)"; });
+
+bar.selectAll("rect")
+    .data(function(d) { return d.valores; })
+    .enter().append("rect")
+    .attr("width", x1.rangeBand())
+    .attr("x", function(d) { return x1(d.name); })
+    .attr("y", function(d) { return y(d.value); })
+    .attr("value", function(d){return d.name;})
+    .attr("height", function(d) { return height - y(d.value); })
+    .style("fill", function(d) { return color(d.name); });
+
+bar
+    .on("mousemove", function(d){
+        divTooltip.style("left", d3.event.pageX+10+"px");
+        divTooltip.style("top", d3.event.pageY-25+"px");
+        divTooltip.style("display", "inline-block");
+        var x = d3.event.pageX, y = d3.event.pageY
+        var elements = document.querySelectorAll(':hover');
+        l = elements.length
+        l = l-1
+        elementData = elements[l].__data__
+        divTooltip.html((d.label)+"<br>"+elementData.name+"<br>"+elementData.value+"%");
+    });
+bar
+    .on("mouseout", function(d){
+        divTooltip.style("display", "none");
+    });
+
+var legend = svg.selectAll(".legend")
+    .data(options.slice())
+    .enter().append("g")
+    .attr("class", "legend")
+    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+legend.append("rect")
+    .attr("x", width - 18)
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", color);
+
+legend.append("text")
+    .attr("x", width - 24)
+    .attr("y", 9)
+    .attr("dy", ".35em")
+    .style("text-anchor", "end")
+    .text(function(d) { return d; });
+
+</script>
+</body>
