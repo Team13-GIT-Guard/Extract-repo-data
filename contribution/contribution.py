@@ -42,5 +42,16 @@ def main():
             total_delete = 0
 
     file.close()
+
+    path = os.path.abspath('contribution_by_commit.html')
+    url = 'file://' + path
+    webbrowser.open(url)
+    path = os.path.abspath('contribution_by_insert.html')
+    url = 'file://' + path
+    webbrowser.open(url)
+    path = os.path.abspath('contribution_by_delete.html')
+    url = 'file://' + path
+    webbrowser.open(url)
+    return
         
 main()
