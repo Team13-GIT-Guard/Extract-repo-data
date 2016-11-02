@@ -73,13 +73,11 @@ def main():
         if "\"committer\":{\"login\"" in format_content[i]:
             if user in format_content[i].split(':')[2]:
                 if time == 0:
-                    print(print_time)
                     file.write(print_time + '\n')
                 else:
                     parsed_print_time = dp.parse(print_time)
                     print_time_in_seconds = int(parsed_print_time.strftime('%s'))
                     if print_time_in_seconds >= time:
-                        print(print_time)
                         file.write(print_time + '\n')
     file.close()
     return
