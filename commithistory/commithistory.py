@@ -45,9 +45,14 @@ def git_contributors(dir):
 
 def git_check(dir,file,beg=0,end=0):
 	if (beg<>0)&(end<>0):
-		res = subprocess.Popen('git log  --pretty="%an" -L '+beg+','+end+':'+file,stdout=subprocess.PIPE,shell=True,cwd=dir)
+		res = subprocess.Popen('git log  --pretty="%an" -L '+str(beg)+','+str(end)+':'+file,stdout=subprocess.PIPE,shell=True,cwd=dir)
+		#rec = subprocess.Popen('git log  --pretty="%an,%ai,%s" -L '+str(beg)+','+str(end)+':'+file,stdout=subprocess.PIPE,shell=True,cwd=dir)
+		writetable(res,1)
 	else:
 		res = subprocess.Popen('git log  --pretty="%an" '+file,stdout=subprocess.PIPE,shell=True,cwd=dir)
+		rec = subprocess.Popen('git log  --pretty="%an,%ai,%s" '+file,stdout=subprocess.PIPE,shell=True,cwd=dir)
+		rec = rec.stdout.readlines()
+		writetable(rec)
 	res = res.stdout.readlines()
 	cons = git_contributors(dir)
 	ret = []
@@ -55,15 +60,33 @@ def git_check(dir,file,beg=0,end=0):
 		num = res.count(con)
 		if (num<>0):
 			ret.append((con.replace('\n',''),num))
-	write(ret)
+	writes(ret)
 	return ret
 
-def write(s):
+def writes(s):
 	csvfile = file('commithistory.csv', 'wb')
 	writer = csv.writer(csvfile)
 	writer.writerow(['contributor', 'times'])
 	writer.writerows(s)
 	csvfile.close()
+
+def writetable(s,p=0):
+	f = file('commit_history.html','r')
+	out = file('commit_his.html','wb')
+	for i in f:
+		if (i.find("marktable")<>-1):
+			if (p<>0):
+				out.write('\n')
+			else:
+				out.write(u"<table border=4 width='80%' align=center><tr bgcolor='#cccccc'><th><br></th><th>Contributor</th><th>Time</th><th>Log</th></tr>\n")
+				count = 0
+				for line in s:
+					count =count +1
+					tmp = line.split(',')
+					out.write('<tr align=center><td>'+str(count)+'</td><td>'+tmp[0]+'</td><td>'+tmp[1]+'</td><td>'+tmp[2]+'</td></tr>'+'\n')
+				out.write(u'</table>')	
+		else:
+			out.write(i)
 
 if __name__ == '__main__':
 	#rmb to clone first
@@ -74,6 +97,6 @@ if __name__ == '__main__':
 		git_check(repo_address,file_address)
 	else:
 		git_check(repo_address,file_address,line[0],line[1])
-	path = os.path.abspath('commit_history.html')
+	path = os.path.abspath('commit_his.html')
 	url = 'file://' + path
 	webbrowser.open(url)
