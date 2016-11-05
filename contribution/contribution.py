@@ -1,11 +1,11 @@
-import urllib.request
+import urllib2
 import webbrowser
 import os
 
 
 
 def take_repo():
-    address = input("Type in repo address: ")
+    address = raw_input("Type in repo address: ")
     return address
 
 def main():
@@ -17,7 +17,7 @@ def main():
     url += "/stats/contributors"
     print(url)
 
-    response = urllib.request.urlopen(url)
+    response = urllib2.urlopen(url)
     file = open("contribution.csv","w")
     file.write("contributor,insert,delete,commit\n")
 
