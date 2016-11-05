@@ -1,28 +1,29 @@
-import urllib.request
+import urllib2
 import webbrowser
 import os
 import datetime
 import dateutil.parser as dp
+import write_to_html
 
 
 def take_repo():
-    address = input("Type in repo address: ")
+    address = raw_input("Type in repo address: ")
     return address
 
 def compare_number():
-    number = input("Type in the number of users to compare:")
+    number = raw_input("Type in the number of users to compare:")
     return int(number)
 
 def take_user():
-    user = input("Type in the user name: ")
+    user = raw_input("Type in the user name: ")
     return user
 
 def input_time():
-    choice = input("Type 'u' for entering unix timestamp;\nType 't' for entering ISO 8601 time;\nType others for default: ")
+    choice = raw_input("Type 'u' for entering unix timestamp;\nType 't' for entering ISO 8601 time;\nType others for default: ")
     if choice == "u":
-        time = int(input("Enter unix timestamp: "))
+        time = int(raw_input("Enter unix timestamp: "))
     elif choice == "t":
-        time = input("Enter ISO 8601 time: ")
+        time = raw_input("Enter ISO 8601 time: ")
         parsed_t = dp.parse(time)
         time = int(parsed_t.strftime('%s'))
     else:
@@ -43,7 +44,7 @@ def main():
     url += "/stats/contributors"
     print(url)
 
-    response = urllib.request.urlopen(url)
+    response = urllib2.urlopen(url)
 
     content = response.read()
     content = content.decode("utf-8")
@@ -121,8 +122,11 @@ def main():
         for sub in users_commit_list:
             file.write(',' + sub[i])
         file.write('\n')
-        
     file.close()
+    write_to_html.main()
+    path = os.path.abspath('compare.html')
+    url = 'file://' + path
+    webbrowser.open(url)
     return
         
 main()

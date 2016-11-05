@@ -1,5 +1,5 @@
 def main():
-    out = open("compare.html","w+",encoding='utf8')
+    out = open("compare.html","w+")
     data = open("compare.csv")
     num_lines = len(data.readlines()) - 1
     data.close()
